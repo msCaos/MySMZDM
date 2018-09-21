@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cms.demo.dao.HomeDao">
+
+    <resultMap id="BaseResultMap" type="com.cms.demo.bean.News">
+        <id column="id" property="id"></id>
+        <result column="uid" property="uid"></result>
+        <association property="user"
+                     javaType="com.cms.demo.bean.User"
+                     select="com.cms.demo.dao.UserDao.selectUserById"
+                     column="uid">
+        </association>
+    </resultMap>
+    <select id="getAllNewsInfo"  resultMap="BaseResultMap">
+        select * from smzdm_news
+    </select>
+
+    <!--resultType="com.cms.demo.bean.News"-->
+
+    <select id="getById" parameterType="int" resultMap="BaseResultMap">
+        select * from smzdm_news where id = #{id}
+    </select>
+    
+    <insert id="insertComment" parameterType="com.cms.demo.bean.Comment">
+        insert into smzdm_comment values (null ,#{content},#{createdDate},#{newsId},#{userId})
+    </insert>
+
+    <update id="addCommentCount" parameterType="int">
+        update smzdm_news set commentCount = commentCount+1 where id = #{id}
+    </update>
+
+    <resultMap id="myComment" type="com.cms.demo.bean.Comment">
+        <id column="id" property="id" ></id>
+        <association  property="user"
+                      javaType="com.cms.demo.bean.User"
+                      select="com.cms.demo.dao.UserDao.selectUserById"
+                      column="userId">
+        </association>
+    </resultMap>
+    <select id="getComentsByNewsId" parameterType="int" resultMap="myComment">
+        select * from smzdm_comment  where newsId = #{id};
+    </select>
+
+    <update id="addNewsLikeCountById" parameterType="int">
+        update smzdm_news set likeCount = likeCount+1 where id = #{id}
+    </update>
+
+    <select id="selectUserLikeCountByNidAndUid" parameterType="com.cms.demo.bean.LikeCount" resultType="com.cms.demo.bean.LikeCount">
+        select * from smzdm_likecount where uid = #{uid} and newsId = #{newsId}
+    </select>
+
+    <insert id="insertToLikeCount" parameterType="com.cms.demo.bean.LikeCount" >
+        insert into smzdm_likecount values (null ,#{uid} ,#{likecount}, #{newsId} ,#{createdDate})
+    </insert>
+
+    <delete id="deleteLikeCount" parameterType="com.cms.demo.bean.LikeCount">
+        delete from smzdm_likecount where uid = #{uid} and newsId = #{newsId}
+    </delete>
+
+    <update id="minusNewsLikeCountById" parameterType="int">
+        update smzdm_news set likeCount = likeCount-1 where id = #{id}
+    </update>
+
+    <select id="getComentsByNewsIdAndUid" parameterType="com.cms.demo.bean.Comment" resultMap="myComment">
+        select * from smzdm_comment  where newsId = #{id} and userId = #{userId};
+    </select>
+
+
+
+
+
+</mapper>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cms.demo.dao.UserDao">
+
+    <insert id="insterRegisterInfo" parameterType="com.cms.demo.bean.User">
+        insert into  smzdm_user values ( null ,#{username},#{password},#{headUrl},#{rember})
+    </insert>
+
+    <select id="selectByUsername" parameterType="string" resultType="com.cms.demo.bean.User">
+        select * from smzdm_user where username = #{username}
+    </select>
+
+    <select id="selectUserById" parameterType="int" resultType="com.cms.demo.bean.User">
+        select * from  smzdm_user where id = #{id}
+    </select>
+
+    <insert id="insertNews" parameterType="com.cms.demo.bean.News">
+        insert into smzdm_news values (null ,#{likeCount},#{image},#{link},#{title},#{commentCount},#{createdDate},#{uid})
+    </insert>
+
+    <select id="selectNidByUid" parameterType="int" resultType="com.cms.demo.bean.News">
+        select * from smzdm_news where uid = #{uid}
+    </select>
+
+    <insert id="insertConversation" parameterType="com.cms.demo.bean.Conversation">
+        insert into smzdm_conversation values (null, #{unread},  #{uid},  #{content},  #{comtToUid},  #{createdDate},  #{id})
+    </insert>
+
+    <update id="updateConversationByUid" parameterType="com.cms.demo.bean.Conversation" >
+        update smzdm_conversation set unread =unread+1,content = #{content},createdDate = #{createdDate},id=id+1 where  uid = #{uid} and comtToUid = #{comtToUid};
+    </update>
+
+    <resultMap id="myUserInConversation" type="com.cms.demo.bean.Conversation">
+        <association  property="user"
+                      javaType="com.cms.demo.bean.User"
+                      select="com.cms.demo.dao.UserDao.selectUserById"
+                      column="uid">
+        </association>
+    </resultMap>
+    <select id="getAllConversationByComtToUid" parameterType="int" resultMap="myUserInConversation">
+        select * from smzdm_conversation where comtToUid = #{comtToUid}
+    </select>
+
+    <select id="getConversationByConversationId" parameterType="int" resultType="com.cms.demo.bean.Conversation">
+        select  * from  smzdm_conversation where conversationId = #{conversationId};
+    </select>
+
+    <insert id="insertMessage" parameterType="com.cms.demo.bean.Message">
+        insert into smzdm_message values (null ,#{uid} ,#{comtToUid} ,#{createdDate} ,#{content})
+    </insert>
+
+    <update id="updateConversationUnread" parameterType="int">
+        update smzdm_conversation set unread = 0 where conversationId = #{conversationId}
+    </update>
+
+
+    <resultMap id="myUserInMessage" type="com.cms.demo.bean.Message">
+        <association  property="user"
+                      javaType="com.cms.demo.bean.User"
+                      select="com.cms.demo.dao.UserDao.selectUserById"
+                      column="uid">
+        </association>
+    </resultMap>
+    <select id="getMessagesByComtToUidAndUid" parameterType="com.cms.demo.bean.Message" resultMap="myUserInMessage">
+        select * from smzdm_message where uid = #{uid} and comtToUid = #{comtToUid}
+    </select>
+
+
+
+
+
+
+
+</mapper>
